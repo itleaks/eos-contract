@@ -4,6 +4,12 @@ cd $WORK_DIR
 WORK_DIR=`pwd`
 OS=`uname`
 
+KEY_PRIVATE_1=5HzZMHGcYY1PEhf37uzECRBXeBHiRQ75LY5ya85kMMr36hCaLHW
+KEY_PUB_1=EOS8jpkUrHmL65iYxTwDQCETuKHq1K5C4N6dTSQsccC5bWjtMQv5Y
+
+KEY_PRIVATE_2=5KjjufiVnLcXULyyBeFzZRzHywtT1MbNfvsfWDEby3WQ9nhNzzg
+KEY_PUB_2=EOS5i7zvW5oUdkyrwSN8VnxX38uwB7U3HvSHZMuUhNgQF6P8H3M4V
+
 #build code
 cd $WORK_DIR/hello
 #eosiocpp -o hello.wast hello.cpp
@@ -12,11 +18,11 @@ cd -
 
 
 if [ ! -f $WORK_DIR"/../passwd.txt" ];then
-	echo "wallet exp not exist, please run ../setup.sh"
-	exit
-else
-	cat $WORK_DIR/../passwd.txt | cleos wallet unlock -n exp
+	../setup.sh
 fi
+cat $WORK_DIR/../passwd.txt | cleos wallet unlock -n exp
+cleos wallet import -n exp $KEY_PRIVATE_1
+cleos wallet import -n exp $KEY_PRIVATE_2
 
 #kill old nodeos
 if [ $OS"x" == "Darwinx" ];then
@@ -30,10 +36,9 @@ fi
 echo "launch nodeos ......"
 nohup nodeos -e -p eosio --plugin eosio::chain_api_plugin --plugin eosio::history_api_plugin --data-dir ./.tmpdata/eosio --resync 2>&1 1>nodeos.log &
 sleep 2
-#使用默认的私钥，公钥，这个你们也都有
-cleos create account eosio hello.code EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV
+cleos create account eosio hello.code $KEY_PUB_1 $KEY_PUB_1
 cleos set contract hello.code ./hello -p hello.code
-cleos create account eosio args.user EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV
+cleos create account eosio args.user $KEY_PUB_2 $KEY_PUB_2
 
 echo ""
 echo ""
