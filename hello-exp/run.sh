@@ -34,5 +34,12 @@ sleep 2
 cleos create account eosio hello.code EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV
 cleos set contract hello.code ./hello -p hello.code
 cleos create account eosio args.user EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV
+
+echo ""
+echo ""
+echo "********run test case **********"
+echo ""
+echo 'cleos push action hello.code hi '[ "args.user" ]' -p hello.code'
 cleos push action hello.code hi '[ "args.user" ]' -p hello.code
+echo 'cleos push action hello.code hi '[ "args.user" ]' -p args.user'
 cleos push action hello.code hi '[ "args.user" ]' -p args.user
