@@ -3,6 +3,11 @@ WORK_DIR="$( dirname "$0"  )"
 cd $WORK_DIR
 
 #create wallet 'exp'
+TOOLS=`which cleos`
+if [ $TOOLS"x" == "x" ];then
+	echo "please build eos from source,and install cleos, nodeos tools"
+	exit
+fi
 PASS=`cleos wallet create -n exp | grep '^"'`
 if [ $PASS"x" != "x" ];then
 	echo $PASS | sed 's/"//g' > ./passwd.txt
