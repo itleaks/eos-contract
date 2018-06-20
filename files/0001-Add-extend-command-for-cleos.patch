@@ -1,0 +1,87 @@
+From fe30a6020a2b41e8233ce5b2a2b119d909b5a187 Mon Sep 17 00:00:00 2001
+From: "itleaks" <itleaks@126.com>
+Date: Wed, 20 Jun 2018 15:30:23 +0000
+Subject: [PATCH] Add extend command for cleos
+
+Signed-off-by: itleaks <itleaks@126.com>
+---
+ programs/cleos/main.cpp | 56 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
+
+diff --git a/programs/cleos/main.cpp b/programs/cleos/main.cpp
+index 3e5b9a5..46bc07b 100644
+--- a/programs/cleos/main.cpp
++++ b/programs/cleos/main.cpp
+@@ -864,6 +864,56 @@ struct create_account_subcommand {
+    }
+ };
+ 
++struct buy_res_subcommand {
++   string from;
++   string account_name;
++   string stake_net;
++   string stake_cpu;
++   uint32_t buy_ram_bytes_in_kbytes = 0;
++   string buy_ram_eos;
++   bool transfer;
++
++   buy_res_subcommand(CLI::App* actionRoot) {
++      auto buyRes = actionRoot->add_subcommand( "buyres", localized("buy ram, stake for bandwidth for receiver account"));
++      buyRes->add_option("from", from, localized("The name of the account buy resource for the receiver account"))->required();
++      buyRes->add_option("receiver", account_name, localized("The name of the receiver account"))->required();
++
++      if (true) {
++         buyRes->add_option("--stake-net", stake_net,
++                                   (localized("The amount of EOS delegated for net bandwidth")))->required();
++         buyRes->add_option("--stake-cpu", stake_cpu,
++                                   (localized("The amount of EOS delegated for CPU bandwidth")))->required();
++         buyRes->add_option("--buy-ram-kbytes", buy_ram_bytes_in_kbytes,
++                                   (localized("The amount of RAM bytes to purchase for the receiver account in kilobytes KiB, default is 8 KiB")));
++         buyRes->add_option("--buy-ram", buy_ram_eos,
++                                   (localized("The amount of RAM bytes to purchase for the receiver account in EOS")));
++         buyRes->add_flag("--transfer", transfer,
++                                 (localized("Transfer voting power and right to unstake EOS to receiver")));
++      }
++
++      add_standard_transaction_options(buyRes);
++
++      buyRes->set_callback([this] {
++            if (true) {
++               if ( buy_ram_eos.empty() && buy_ram_bytes_in_kbytes == 0) {
++                  std::cerr << "ERROR: Either --buy-ram or --buy-ram-kbytes with non-zero value is required" << std::endl;
++                  return;
++               }
++               action buyram = !buy_ram_eos.empty() ? create_buyram(from, account_name, to_asset(buy_ram_eos))
++                  : create_buyrambytes(from, account_name, buy_ram_bytes_in_kbytes * 1024);
++               auto net = to_asset(stake_net);
++               auto cpu = to_asset(stake_cpu);
++               if ( net.get_amount() != 0 || cpu.get_amount() != 0 ) {
++                  action delegate = create_delegate( from, account_name, net, cpu, transfer);
++                  send_actions( { delegate, buyram } );
++               } else {
++                  send_actions( { buyram } );
++               }
++            }
++      });
++   }
++};
++
+ struct unregister_producer_subcommand {
+    string producer_str;
+ 
+@@ -1573,6 +1623,12 @@ int main( int argc, char** argv ) {
+    // create account
+    auto createAccount = create_account_subcommand( create, true /*simple*/ );
+ 
++   // extend subcommand
++   auto extend = app.add_subcommand("ext", localized("extend command for cleos"), false);
++   extend->require_subcommand();
++   // buy resource
++   auto buyRes = buy_res_subcommand( extend );
++
+    // Get subcommand
+    auto get = app.add_subcommand("get", localized("Retrieve various items and information from the blockchain"), false);
+    get->require_subcommand();
+-- 
+2.7.4
+
