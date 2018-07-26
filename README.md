@@ -11,6 +11,9 @@ https://blog.csdn.net/itleaks/article/category/7700370<br>
 >cd hello-exp<br>
 >./run.sh
 # Contact
-Welcome to join qq group:787804520 <br>
-欢迎大家加入qq群'EOS以太坊技术交流群':787804520<br>
-<img src="https://img-blog.csdn.net/20180528111903133" width=200 height=256 />
+Welcome to add my wechat:itleaks<br>
+欢迎大家加我微信:itleaks<br>
+<img src="http://faucet.eosfavor.com/weixin.png" width=200 height=256 />
+Welcome to join qq group:829789117<br>
+欢迎大家加入qq群'EOS以太坊技术交流群':829789117<br>
+<img src="http://faucet.eosfavor.com/qqgroup.jpg" width=200 height=256 />
