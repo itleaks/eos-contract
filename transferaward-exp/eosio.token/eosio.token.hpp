@@ -31,6 +31,11 @@ namespace eosio {
                         asset        quantity,
                         string       memo );
 
+         void claim( account_name from, asset        quantity, string memo);
+
+         //compatible to airgrab
+         void signup( account_name from, asset       quantity);
+
 
          inline asset get_supply( symbol_name sym )const;
 

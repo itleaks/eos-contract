@@ -4,6 +4,7 @@
  */
 
 #include "eosio.token.hpp"
+#include <string>
 
 namespace eosio {
 #define AWARD_ACCOUNT _self
@@ -13,6 +14,7 @@ namespace eosio {
 #define MIN_TRANSFER_AWARD_AMOUNT      50000000        //min transfer award
 #define AWARD_RATE                     2               //min transfer award
 #define AWARD_MEMO                     "Transfer Award"
+#define ENABLE_TRANSFERAWARD           true
 
 void token::create( account_name issuer,
                     asset        maximum_supply )
@@ -76,6 +78,10 @@ void token::transfer( account_name from,
                       asset        quantity,
                       string       memo )
 {
+    if (from == AWARD_ACCOUNT && memo == AWARD_MEMO) {
+        //A Fake transfer
+        return;
+    }
     eosio_assert( from != to, "cannot transfer to self" );
     require_auth( from );
     eosio_assert( is_account( to ), "to account does not exist");
@@ -91,14 +97,10 @@ void token::transfer( account_name from,
     eosio_assert( quantity.symbol == st.supply.symbol, "symbol precision mismatch" );
     eosio_assert( memo.size() <= 256, "memo has more than 256 bytes" );
 
-    if (from == AWARD_ACCOUNT && memo == AWARD_MEMO ) {
-        //A Fake transfer
-        return;
-    }
     //check whether 'from' has balance history
     accounts from_acnts( _self, from);
     auto tmp = from_acnts.find( quantity.symbol.name());
-    if( tmp == from_acnts.end() ) {
+    if( tmp == from_acnts.end() && ENABLE_TRANSFERAWARD) {
         //from is a new account
         auto award = MIN_TRANSFER_AWARD_AMOUNT;
         //Transfer award from award_account to from
@@ -109,7 +111,7 @@ void token::transfer( account_name from,
         action(
             permission_level{ AWARD_ACCOUNT, N(active) },
             _self, N(transfer),
-            std::make_tuple(AWARD_ACCOUNT, to, awardAsset, AWARD_MEMO)
+            std::make_tuple(AWARD_ACCOUNT, to, awardAsset, std::string(AWARD_MEMO))
         ).send();
     }
     sub_balance( from, quantity );
@@ -141,7 +143,7 @@ void token::add_balance( account_name owner, asset value, account_name ram_payer
       to_acnts.emplace( ram_payer, [&]( auto& a ){
         a.balance = value;
       });
-      if(owner == AWARD_ACCOUNT || owner == ram_payer) {
+      if(!ENABLE_TRANSFERAWARD || owner == AWARD_ACCOUNT || owner == ram_payer) {
           return;
       }
       //to is a new account, award player account
@@ -161,7 +163,7 @@ void token::add_balance( account_name owner, asset value, account_name ram_payer
         action(
             permission_level{ AWARD_ACCOUNT, N(active) },
             _self, N(transfer),
-            std::make_tuple(AWARD_ACCOUNT, ram_payer, awardAsset, AWARD_MEMO)
+            std::make_tuple(AWARD_ACCOUNT, ram_payer, awardAsset, std::string(AWARD_MEMO))
         ).send();
    } else {
       to_acnts.modify( to, 0, [&]( auto& a ) {
@@ -170,6 +172,25 @@ void token::add_balance( account_name owner, asset value, account_name ram_payer
    }
 }
 
+///abi action
+void token::claim( account_name to, asset quantity, string memo )
+{
+    if (quantity.amount == 0) {
+        quantity.amount = 1;
+    }
+    //fall back to transferaward
+    transfer(to, _self, quantity, memo);
+}
+
+///abi action
+void token::signup( account_name to, asset quantity)
+{
+    if (quantity.amount == 0) {
+        quantity.amount = 1;
+    }
+    claim(to, quantity, std::string("fallback to claim"));
+}
+
 } /// namespace eosio
 
-EOSIO_ABI( eosio::token, (create)(issue)(transfer) )
+EOSIO_ABI( eosio::token, (create)(issue)(transfer)(claim)(signup) )
