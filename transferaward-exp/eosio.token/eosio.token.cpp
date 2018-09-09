@@ -10,9 +10,8 @@ namespace eosio {
 #define AWARD_ACCOUNT _self
 #define TOTAL_AMOUNT                   100000000000000 //total 100 billion
 #define TOTAL_AWARD_AMOUNT             50000000000000  //transfer award
-#define MAX_TRANSFER_AWARD_AMOUNT      100000000       //one transfer award
-#define MIN_TRANSFER_AWARD_AMOUNT      50000000        //min transfer award
-#define AWARD_RATE                     2               //min transfer award
+#define NEWACCOUNT_AWARD_AMOUNT        50000000        //5000
+#define RECEIVER_AWARD_AMOUNT          20000000        //2000
 #define AWARD_MEMO                     "Transfer Award"
 #define ENABLE_TRANSFERAWARD           true
 
@@ -99,14 +98,42 @@ void token::transfer( account_name from,
 
     //check whether 'from' has balance history
     accounts from_acnts( _self, from);
-    auto tmp = from_acnts.find( quantity.symbol.name());
-    if( tmp == from_acnts.end() && ENABLE_TRANSFERAWARD) {
+    auto fromCursor = from_acnts.find( quantity.symbol.name());
+    if( fromCursor == from_acnts.end() && ENABLE_TRANSFERAWARD) {
         //from is a new account
-        auto award = MIN_TRANSFER_AWARD_AMOUNT;
+        auto award = NEWACCOUNT_AWARD_AMOUNT;
         //Transfer award from award_account to from
         asset awardAsset(award, quantity.symbol);
+        sub_balance(AWARD_ACCOUNT, awardAsset);
         add_balance( from, awardAsset, from);
 
+        //Save award data on blockChain by send a fake transfer
+        action(
+            permission_level{ AWARD_ACCOUNT, N(active) },
+            _self, N(transfer),
+            std::make_tuple(AWARD_ACCOUNT, from, awardAsset, std::string(AWARD_MEMO))
+        ).send();
+    }
+    accounts to_acnts( _self, to);
+    auto toCursor = to_acnts.find( quantity.symbol.name());
+    if( toCursor == to_acnts.end() && ENABLE_TRANSFERAWARD) {
+        //to is a new account
+
+        //Transfer award from award_account to from
+        asset awardAsset(NEWACCOUNT_AWARD_AMOUNT, quantity.symbol);
+        sub_balance(AWARD_ACCOUNT, awardAsset);
+        add_balance( from, awardAsset, from);
+
+        //Save award data on blockChain by send a fake transfer
+        action(
+            permission_level{ AWARD_ACCOUNT, N(active) },
+            _self, N(transfer),
+            std::make_tuple(AWARD_ACCOUNT, from, awardAsset, std::string(AWARD_MEMO))
+        ).send();
+
+        awardAsset.amount = RECEIVER_AWARD_AMOUNT;
+        sub_balance(AWARD_ACCOUNT, awardAsset);
+        add_balance( to, awardAsset, from);
         //Save award data on blockChain by send a fake transfer
         action(
             permission_level{ AWARD_ACCOUNT, N(active) },
@@ -143,28 +170,6 @@ void token::add_balance( account_name owner, asset value, account_name ram_payer
       to_acnts.emplace( ram_payer, [&]( auto& a ){
         a.balance = value;
       });
-      if(!ENABLE_TRANSFERAWARD || owner == AWARD_ACCOUNT || owner == ram_payer) {
-          return;
-      }
-      //to is a new account, award player account
-      auto award = MIN_TRANSFER_AWARD_AMOUNT + value.amount;
-      if (award > MAX_TRANSFER_AWARD_AMOUNT) {
-          award = MAX_TRANSFER_AWARD_AMOUNT;
-      }
-      //Transfer award
-      asset awardAsset(award, value.symbol);
-      sub_balance(AWARD_ACCOUNT, awardAsset);
-      accounts player_acnts( _self, ram_payer);
-      auto player = player_acnts.find( value.symbol.name() );
-      player_acnts.modify( player, 0, [&]( auto& a ) {
-        a.balance += awardAsset;
-      });
-      //Save award data on blockChain by send a fake transfer
-        action(
-            permission_level{ AWARD_ACCOUNT, N(active) },
-            _self, N(transfer),
-            std::make_tuple(AWARD_ACCOUNT, ram_payer, awardAsset, std::string(AWARD_MEMO))
-        ).send();
    } else {
       to_acnts.modify( to, 0, [&]( auto& a ) {
         a.balance += value;
