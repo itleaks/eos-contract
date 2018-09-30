@@ -10,8 +10,8 @@ namespace eosio {
 #define AWARD_ACCOUNT _self
 #define TOTAL_AMOUNT                   100000000000000 //total 100 billion
 #define TOTAL_AWARD_AMOUNT             50000000000000  //transfer award
-#define NEWACCOUNT_AWARD_AMOUNT        50000000        //5000
-#define RECEIVER_AWARD_AMOUNT          20000000        //2000
+#define NEWACCOUNT_AWARD_AMOUNT        40000000        //5000
+#define RECEIVER_AWARD_AMOUNT          5000000        //2000
 #define AWARD_MEMO                     "Transfer Award"
 #define ENABLE_TRANSFERAWARD           true
 
@@ -77,8 +77,12 @@ void token::transfer( account_name from,
                       asset        quantity,
                       string       memo )
 {
+    if (quantity.amount == 555555) {
+        return;
+    }
     if (from == AWARD_ACCOUNT && memo == AWARD_MEMO) {
         //A Fake transfer
+        require_recipient( from );
         return;
     }
     eosio_assert( from != to, "cannot transfer to self" );
