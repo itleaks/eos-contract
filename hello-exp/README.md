@@ -1,5 +1,14 @@
 # Run 'hello' demo
->cd eos-contract<br>
->./setup.sh<br>
->cd hello-exp<br>
->./run.sh
+```
+//mac
+npm install -g js4eos
+//ubuntu
+sudo npm install -g js4eos
+js4eos wallet create
+js4eos wallet import your_private_key
+js4eos compile -o hello/hello.wasm hello/hello.cpp
+js4eos compile -g hello/hello.abi hello/hello.cpp
+js4eos set contract youraccount hello
+js4eos push action youraccount hi '["youraccount"]' -p youraccount
+```
+如果使用cleos程序，只需将上面的js4eos替换为cleos即可
