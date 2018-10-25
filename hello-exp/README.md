@@ -12,3 +12,11 @@ js4eos set contract youraccount hello
 js4eos push action youraccount hi '["youraccount"]' -p youraccount
 ```
 如果使用cleos程序，只需将上面的js4eos替换为cleos即可
+
+如果你在linux/mac下可以使用run.sh脚本一键执行
+```
+#install js4eos if not
+sudo npm install -g js4eos
+#run
+./run.sh
+```

@@ -4,47 +4,69 @@ cd $WORK_DIR
 WORK_DIR=`pwd`
 OS=`uname`
 
-KEY_PRIVATE_1=5HzZMHGcYY1PEhf37uzECRBXeBHiRQ75LY5ya85kMMr36hCaLHW
-KEY_PUB_1=EOS8jpkUrHmL65iYxTwDQCETuKHq1K5C4N6dTSQsccC5bWjtMQv5Y
+COMPILER='js4eos compile'
+#COMPILER='eosiocpp'
+CLEOS='js4eos'
+#CLEOS='$CLEOS'
 
-KEY_PRIVATE_2=5KjjufiVnLcXULyyBeFzZRzHywtT1MbNfvsfWDEby3WQ9nhNzzg
+LOCAL=true
+if [ $LOCAL = true ];then
+ROOT_ACCOUNT_PRI_KEY='5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3'
+ROOT_ACCOUNT_PUB_KEY='EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV'
+ROOT_ACCOUNT='eosio'
+else
+ROOT_ACCOUNT_PRI_KEY='private key of youraccount'
+ROOT_ACCOUNT_PUB_KEY='public key of youraccount'
+ROOT_ACCOUNT='youraccount'
+fi
+
+#set network
+if [ $LOCAL = true ];then
+js4eos localnet reset
+# launch nodeos command
+else
+#set jungle testnet
+js4eos config -n jungle
+#CLEOS='cleos -u junglenodeurl'
+fi
+
+KEY_PRI_1=5HzZMHGcYY1PEhf37uzECRBXeBHiRQ75LY5ya85kMMr36hCaLHW
+KEY_PUB_1=EOS8jpkUrHmL65iYxTwDQCETuKHq1K5C4N6dTSQsccC5bWjtMQv5Y
+KEY_PRI_2=5KjjufiVnLcXULyyBeFzZRzHywtT1MbNfvsfWDEby3WQ9nhNzzg
 KEY_PUB_2=EOS5i7zvW5oUdkyrwSN8VnxX38uwB7U3HvSHZMuUhNgQF6P8H3M4V
 
 #build code
 cd $WORK_DIR/hello
-#eosiocpp -o hello.wast hello.cpp
-#eosiocpp -g hello.abi hello.cpp
+echo "compiling"
+$COMPILER -o hello.wast hello.cpp
+$COMPILER -g hello.abi hello.cpp
 cd -
 
+# delete and create wallet to avoid input password
+# only js4eos has delete command, formal cleos has no this command
+# you need to remove 'test' wallet file manually located in $HOME/eosio-wallet
+$CLEOS wallet delete -n test
+$CLEOS wallet create -n test
 
-if [ ! -f $WORK_DIR"/../passwd.txt" ];then
-	../setup.sh
-fi
-cat $WORK_DIR/../passwd.txt | cleos wallet unlock -n exp
-cleos wallet import -n exp $KEY_PRIVATE_1
-cleos wallet import -n exp $KEY_PRIVATE_2
+#import private key
+echo "creating account"
+$CLEOS wallet import -n test $ROOT_ACCOUNT_PRI_KEY
+$CLEOS wallet import -n test $KEY_PRI_1
+$CLEOS wallet import -n test $KEY_PRI_2
 
-#kill old nodeos
-if [ $OS"x" == "Darwinx" ];then
-	ps a > ./tmp.txt
-	grep "nodeos" ./tmp.txt|awk '{print $1}'|xargs kill -9
-	rm ./tmp.txt
-else
-	ps auxf|grep "nodeos -e"|awk '{print $2}'|xargs kill -9
-fi
-#launch nodeos
-echo "launch nodeos ......"
-nohup nodeos -e -p eosio --plugin eosio::chain_api_plugin --plugin eosio::history_api_plugin --data-dir ./.tmpdata/eosio --resync 2>&1 1>nodeos.log &
-sleep 2
-cleos create account eosio hello.code $KEY_PUB_1 $KEY_PUB_1
-cleos set contract hello.code ./hello -p hello.code
-cleos create account eosio args.user $KEY_PUB_2 $KEY_PUB_2
+$CLEOS create account eosio hello.code $KEY_PUB_1 $KEY_PUB_1
+$CLEOS set contract hello.code ./hello -p hello.code
+$CLEOS create account eosio args.user $KEY_PUB_2 $KEY_PUB_2
 
 echo ""
 echo ""
 echo "********run test case **********"
 echo ""
-echo 'cleos push action hello.code hi '[ "args.user" ]' -p hello.code'
-cleos push action hello.code hi '[ "args.user" ]' -p hello.code
-echo 'cleos push action hello.code hi '[ "args.user" ]' -p args.user'
-cleos push action hello.code hi '[ "args.user" ]' -p args.user
+echo '$CLEOS push action hello.code hi '[ "args.user" ]' -p hello.code'
+$CLEOS push action hello.code hi '[ "args.user" ]' -p hello.code
+echo '$CLEOS push action hello.code hi '[ "args.user" ]' -p args.user'
+$CLEOS push action hello.code hi '[ "args.user" ]' -p args.user
+if [ $LOCAL = true ];then
+echo "stop nodeos"
+js4eos localnet stop
+fi
