@@ -4,5 +4,6 @@ Record data on EOS for free
 
 # Operation(操作)
 ```
-cleos.sh set contract youraccount ./freestorage
+js4eos set contract youraccount ./freestorage
 ```
+上面的js4eos也可用EOS官方的cleos替代

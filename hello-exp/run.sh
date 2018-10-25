@@ -22,6 +22,7 @@ fi
 
 #set network
 if [ $LOCAL = true ];then
+js4eos config set -n localnet
 js4eos localnet reset
 # launch nodeos command
 else
@@ -38,7 +39,7 @@ KEY_PUB_2=EOS5i7zvW5oUdkyrwSN8VnxX38uwB7U3HvSHZMuUhNgQF6P8H3M4V
 #build code
 cd $WORK_DIR/hello
 echo "compiling"
-$COMPILER -o hello.wast hello.cpp
+$COMPILER -o hello.wasm hello.cpp
 $COMPILER -g hello.abi hello.cpp
 cd -
 
