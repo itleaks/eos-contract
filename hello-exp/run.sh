@@ -7,7 +7,7 @@ OS=`uname`
 COMPILER='js4eos compile'
 #COMPILER='eosiocpp'
 CLEOS='js4eos'
-#CLEOS='$CLEOS'
+#CLEOS='cleos'
 
 LOCAL=true
 if [ $LOCAL = true ];then
@@ -22,26 +22,42 @@ fi
 
 #set network
 if [ $LOCAL = true ];then
-js4eos config set -n localnet
-js4eos localnet reset
+$CLEOS config set -n localnet
+$CLEOS localnet reset
 # launch nodeos command
 else
 #set jungle testnet
-js4eos config -n jungle
+$CLEOS config -n jungle
 #CLEOS='cleos -u junglenodeurl'
 fi
 
-KEY_PRI_1=5HzZMHGcYY1PEhf37uzECRBXeBHiRQ75LY5ya85kMMr36hCaLHW
-KEY_PUB_1=EOS8jpkUrHmL65iYxTwDQCETuKHq1K5C4N6dTSQsccC5bWjtMQv5Y
-KEY_PRI_2=5KjjufiVnLcXULyyBeFzZRzHywtT1MbNfvsfWDEby3WQ9nhNzzg
-KEY_PUB_2=EOS5i7zvW5oUdkyrwSN8VnxX38uwB7U3HvSHZMuUhNgQF6P8H3M4V
+CONTRACT_NAME='hello'
 
-#build code
-cd $WORK_DIR/hello
-echo "compiling"
-$COMPILER -o hello.wasm hello.cpp
-$COMPILER -g hello.abi hello.cpp
-cd -
+if [ $LOCAL = true ];then
+CONTRACT_ACCOUNT='contract1111'
+TEST_ACCOUNT1=testaccount1
+TEST_ACCOUNT2=testaccount2
+
+CONTRACT_ACCOUNT_PRI='5JpRW33MdJQWoVUcLrLrkki8M8c8eaZDevTrHJLtPkUX7Su6DPU'
+CONTRACT_ACCOUNT_PUB='EOS6z1ZU2qVeDBmneBMfHACFdMwxfjsRMHTZARRF6uR3hYyD6nuw6'
+TEST_ACCOUNT_PRI_1='5HzZMHGcYY1PEhf37uzECRBXeBHiRQ75LY5ya85kMMr36hCaLHW'
+TEST_ACCOUNT_PUB_1='EOS8jpkUrHmL65iYxTwDQCETuKHq1K5C4N6dTSQsccC5bWjtMQv5Y'
+TEST_ACCOUNT_PRI_2='5KjjufiVnLcXULyyBeFzZRzHywtT1MbNfvsfWDEby3WQ9nhNzzg'
+TEST_ACCOUNT_PUB_2='EOS5i7zvW5oUdkyrwSN8VnxX38uwB7U3HvSHZMuUhNgQF6P8H3M4V'
+else
+#please modify below account to a real 12 characters account
+CONTRACT_ACCOUNT=xxx
+TEST_ACCOUNT1=xxxx
+TEST_ACCOUNT2=xxx
+
+#please modify below key to a real key for corresponding account
+CONTRACT_ACCOUNT_PRI='xx'
+CONTRACT_ACCOUNT_PUB='xx'
+TEST_ACCOUNT_PRI_1='xx'
+TEST_ACCOUNT_PUB_1='xx'
+TEST_ACCOUNT_PRI_2='xx'
+TEST_ACCOUNT_PUB_2='xxx'
+fi
 
 # delete and create wallet to avoid input password
 # only js4eos has delete command, formal cleos has no this command
@@ -50,23 +66,39 @@ $CLEOS wallet delete -n test
 $CLEOS wallet create -n test
 
 #import private key
-echo "creating account"
 $CLEOS wallet import -n test $ROOT_ACCOUNT_PRI_KEY
-$CLEOS wallet import -n test $KEY_PRI_1
-$CLEOS wallet import -n test $KEY_PRI_2
+$CLEOS wallet import -n test $CONTRACT_ACCOUNT_PRI
+$CLEOS wallet import -n test $TEST_ACCOUNT_PRI_1
+$CLEOS wallet import -n test $TEST_ACCOUNT_PRI_2
 
-$CLEOS create account eosio hello.code $KEY_PUB_1 $KEY_PUB_1
-$CLEOS set contract hello.code ./hello -p hello.code
-$CLEOS create account eosio args.user $KEY_PUB_2 $KEY_PUB_2
+if [ $LOCAL = true ];then
+echo "creating account"
+$CLEOS create account eosio $CONTRACT_ACCOUNT $CONTRACT_ACCOUNT_PUB $CONTRACT_ACCOUNT_PUB
+$CLEOS create account eosio $TEST_ACCOUNT1 $TEST_ACCOUNT_PUB_1 $TEST_ACCOUNT_PUB_1
+$CLEOS create account eosio $TEST_ACCOUNT2 $TEST_ACCOUNT_PUB_2 $TEST_ACCOUNT_PUB_2
+else
+#accounts would already be created in other networks, do nothing here
+echo ""
+fi
+
+#build code
+cd $WORK_DIR/$CONTRACT_NAME
+echo "compiling"
+$COMPILER -o $CONTRACT_NAME.wasm $CONTRACT_NAME.cpp
+$COMPILER -g $CONTRACT_NAME.abi $CONTRACT_NAME.cpp
+cd -
+
+$CLEOS set contract $CONTRACT_ACCOUNT $CONTRACT_NAME -p $CONTRACT_ACCOUNT
+
 
 echo ""
 echo ""
 echo "********run test case **********"
 echo ""
-echo '$CLEOS push action hello.code hi '[ "args.user" ]' -p hello.code'
-$CLEOS push action hello.code hi '[ "args.user" ]' -p hello.code
-echo '$CLEOS push action hello.code hi '[ "args.user" ]' -p args.user'
-$CLEOS push action hello.code hi '[ "args.user" ]' -p args.user
+
+$CLEOS push action $CONTRACT_ACCOUNT hi '[ "args.user" ]' -p $TEST_ACCOUNT2
+
+$CLEOS push action $CONTRACT_ACCOUNT hi '[ "'$TEST_ACCOUNT2'" ]' -p $TEST_ACCOUNT2
 if [ $LOCAL = true ];then
 echo "stop nodeos"
 js4eos localnet stop
