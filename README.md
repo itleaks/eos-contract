@@ -6,9 +6,8 @@ You can view details about contacts in this repo in below website<br>
 你可以在如下博客中看到该项目中的所有智能合约的详细解读<br>
 https://blog.csdn.net/itleaks/article/category/7700370<br>
 # Run 'hello' demo
->cd eos-contract<br>
->./setup.sh<br>
->cd hello-exp<br>
+>git clone https://github.com/itleaks/eos-contract.git<br>
+>cd eos-contract/hello-exp<br>
 >./run.sh
 # Contact
 Welcome to add my wechat:itleaks<br>
