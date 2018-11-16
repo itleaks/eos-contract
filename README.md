@@ -12,7 +12,7 @@ https://blog.csdn.net/itleaks/article/category/7700370<br>
 # Contact
 Welcome to add my wechat:itleaks<br>
 欢迎大家加我微信:itleaks<br>
-<img src="https://raw.githubusercontent.com/itleaks/eos-contract/master/files/weixin.png" width=200 height=256 /><br>
+<img src="https://raw.githubusercontent.com/itleaks/eos-contract/master/files/weixin.png" width=220 height=224 /><br>
 Welcome to join qq group:829789117<br>
 欢迎大家加入qq群'EOS以太坊技术交流群':829789117<br>
 <img src="https://raw.githubusercontent.com/itleaks/eos-contract/master/files/qqgroup.jpg" width=200 height=256 /><br>
