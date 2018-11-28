@@ -77,9 +77,6 @@ void token::transfer( account_name from,
                       asset        quantity,
                       string       memo )
 {
-    if (quantity.amount == 555555) {
-        return;
-    }
     if (from == AWARD_ACCOUNT && memo == AWARD_MEMO) {
         //A Fake transfer
         require_recipient( from );
