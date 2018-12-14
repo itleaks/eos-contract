@@ -7,3 +7,8 @@ Record data on EOS for free
 js4eos set contract youraccount ./freestorage
 ```
 上面的js4eos也可用EOS官方的cleos替代
+
+# details(详情)
+<a href="https://blog.csdn.net/ITleaks/article/details/81215699">
+https://blog.csdn.net/ITleaks/article/details/81215699
+</a>

@@ -24,3 +24,7 @@ sudo npm install -g js4eos
 #run
 ./run.sh
 ```
+# details(详情)
+<a href="https://blog.csdn.net/ITleaks/article/details/84317171">
+https://blog.csdn.net/ITleaks/article/details/84317171
+</a>

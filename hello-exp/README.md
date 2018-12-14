@@ -17,6 +17,10 @@ js4eos push action youraccount hi '["youraccount"]' -p youraccount
 ```
 #install js4eos if not
 sudo npm install -g js4eos
-#run
+#run if in linux
 ./run.sh
 ```
+# details(详情)
+<a href="https://blog.csdn.net/ITleaks/article/details/80461917">
+https://blog.csdn.net/ITleaks/article/details/80461917
+</a>

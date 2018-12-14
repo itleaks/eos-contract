@@ -19,3 +19,7 @@ js4eos push action youraccount hi '[1000, "testaccount"]' -p testaccount
 js4eos push action youraccount hi '[1001, "testaccount"]' -p testaccount
 ```
 如果使用cleos程序，只需将上面的js4eos替换为cleos即可
+# details(详情)
+<a href="https://blog.csdn.net/ITleaks/article/details/83378319">
+https://blog.csdn.net/ITleaks/article/details/83378319
+</a>

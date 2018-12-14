@@ -11,3 +11,7 @@ cleos push action contractaccount signup '["useruseridx2", "0.0000 TOKEN"]' -p u
 #useruseridx3获得5000 + 5000 token奖励,useruseridx4获得5000 token
 cleos push action contractaccount transfer '["useruseridx3", "useruseridx4", "5000.0000 token"]' -p useruseridx3
 ```
+# details(详情)
+<a href="https://blog.csdn.net/ITleaks/article/details/82218485">
+https://blog.csdn.net/ITleaks/article/details/82218485
+</a>

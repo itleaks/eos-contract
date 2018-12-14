@@ -7,3 +7,8 @@ Record persist data on EOS with table
 >./setup.sh<br>
 >cd table-exp<br>
 >./run.sh
+
+# details(详情)
+<a href="https://blog.csdn.net/ITleaks/article/details/80563948">
+https://blog.csdn.net/ITleaks/article/details/80563948
+</a>

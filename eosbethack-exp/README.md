@@ -7,3 +7,7 @@ cleos set contract contractaccount eosbethack
 //下面的EOS转账会调用contractaccount这个智能合约的transfer方法
 cleos push action eosio.token transfer '["testaccount", "contractaccount", "3.0000 EOS", "50-invitor"]' -p testaccount
 ```
+# details(详情)
+<a href="https://blog.csdn.net/ITleaks/article/details/83069431">
+https://blog.csdn.net/ITleaks/article/details/83069431
+</a>

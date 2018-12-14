@@ -10,3 +10,8 @@ cleos set account permission args.user1 active '{"threshold": 1,"keys": [],"acco
 >./setup.sh<br>
 >cd callcontract-exp<br>
 >./run.sh
+
+# details(详情)
+<a href="https://blog.csdn.net/ITleaks/article/details/80535318">
+https://blog.csdn.net/ITleaks/article/details/80535318
+</a>
