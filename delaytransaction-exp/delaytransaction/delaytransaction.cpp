@@ -14,8 +14,8 @@ class delaytransaction : public eosio::contract {
         txn.actions.emplace_back(
             eosio::permission_level(_self, N(active)),
             _self,
-            N(delayedHi),
-            std::make_tuple());
+            N(delayedhi),
+            std::make_tuple(id));
         txn.delay_sec = 360;
         //(sender_id, payer, replace_existed)
         txn.send(id, _self, false);
